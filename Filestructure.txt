@@ -1,0 +1,19 @@
+gti_checker/
+│
+├── app/
+│   ├── backend/
+│   │   ├── app.py          # Flask API logic
+│   │   ├── db_utils.py     # Database utilities
+│   │   ├── requirements.txt # Python dependencies
+│   │   ├── config.json     # Database credentials
+│   │
+│   └── frontend/
+│       ├── main.py         # GUI with Tkinter
+│       ├── scraper.py      # Chrome detection & scraping
+│
+├── assets/
+│   ├── icon.png            # App icon for EXE
+│
+├── build/                  # EXE build folder
+├── README.md               # Documentation
+└── setup.py                # Build script for PyInstaller
