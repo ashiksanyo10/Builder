@@ -1,28 +1,48 @@
 import tkinter as tk
 from tkinter import messagebox
-import requests
-from scraper import scrape_website
+from scraper import scrape_data
+from backend import db_utils
 
-API_URL = "http://127.0.0.1:5000/check"
 
-def check_gti():
-    gti, task_id = scrape_website()
-    if not gti or not task_id:
-        messagebox.showerror("Error", "Unable to scrape GTI or Task ID.")
-        return
+class GTICheckerApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("GTI Duplicate Check")
+        self.root.geometry("300x150")
+        
+        # Create UI components
+        self.start_button = tk.Button(root, text="Start", command=self.start_check)
+        self.start_button.pack(pady=20)
+        
+        self.stop_button = tk.Button(root, text="Stop", command=self.stop_check)
+        self.stop_button.pack(pady=10)
+        
+    def start_check(self):
+        # Scrape data and check for duplicates
+        try:
+            gti, task_id = scrape_data()
+            if not gti:
+                messagebox.showinfo("Error", "Website is not open or GTI not found!")
+                return
+            
+            duplicate, row_id, old_task_id = db_utils.check_duplicate(gti, task_id)
+            
+            if duplicate:
+                db_utils.log_duplicate(gti, old_task_id, task_id)
+                messagebox.showinfo(
+                    "Duplicate Found", 
+                    f"Duplicate Found!\nRow ID: {row_id}\nOld Task ID: {old_task_id}"
+                )
+            else:
+                messagebox.showinfo("Not a Duplicate", "Not a duplicate. Please review!")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred: {e}")
 
-    response = requests.post(API_URL, json={"gti": gti, "task_id": task_id})
-    result = response.json()
+    def stop_check(self):
+        self.root.destroy()
 
-    if result["status"] == "duplicate":
-        messagebox.showinfo("Duplicate Found", f"GTI: {gti}\nRow ID: {result['rowid']}\nOld Task ID: {result['old_task_id']}")
-    else:
-        messagebox.showinfo("Not a Duplicate", "Please review the content.")
 
-root = tk.Tk()
-root.title("GTI Duplicate Checker")
-
-check_button = tk.Button(root, text="Check GTI", command=check_gti)
-check_button.pack()
-
-root.mainloop()
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = GTICheckerApp(root)
+    root.mainloop()
