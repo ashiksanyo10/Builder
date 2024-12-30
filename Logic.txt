@@ -1,0 +1,14 @@
+When a duplicate is detected:
+
+Old Task ID:
+Comes from the database (content_table) for the matching GTI.
+New Task ID:
+Comes from the website, as scraped by the app.
+For example:
+
+GTI from the website: 1234
+GTI exists in the database:
+Row: rowid=10
+Task ID in the database: TASK001
+Duplicate log entry:
+
